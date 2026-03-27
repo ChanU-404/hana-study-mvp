@@ -172,7 +172,7 @@ function drawAvatarOnCanvas(canvasId, equippedIds) {
 function renderLogin() {
   return `
     <div style="padding: 40px 20px; display:flex; flex-direction:column; align-items:center; height:100%; background:#fff;">
-      <h1 style="font-size:32px; font-weight:lighter; letter-spacing:1px; margin-top:40px; margin-bottom:40px; color:#222;">하나 Cheer Up!</h1>
+      <h1 style="font-size:32px; font-weight:lighter; letter-spacing:1px; margin-top:40px; margin-bottom:40px; color:#222;"><span style="font-weight:bold;">하나랑</span> Cheer Up!</h1>
       
       <div style="flex:1; display:flex; justify-content:center; align-items:center; width:100%;">
         <!-- 메인 캐릭터 일러스트 -->
