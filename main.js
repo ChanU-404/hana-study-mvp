@@ -290,11 +290,9 @@ function renderOnboarding() {
         <div style="font-size:14px; line-height:1.6;">
           <label style="display:block; margin-bottom:15px; cursor:pointer;">
             <input type="radio" name="track" value="A" id="trackA"> <strong style="color:var(--hana-green);">[트랙 A 결과형] </strong> 자격증 위주 취준생
-            <div style="font-size:12px; color:#888; margin-top:4px; padding-left:22px;">목표 자격증 취득 시 파격 금리 혜택!</div>
           </label>
           <label style="display:block; cursor:pointer;">
             <input type="radio" name="track" value="B" id="trackB"> <strong style="color:var(--hana-green);">[트랙 B 과정형] </strong> 꾸준함이 무기 (포폴 등)
-            <div style="font-size:12px; color:#888; margin-top:4px; padding-left:22px;">매일매일 스터디 인증 일수에 비례한 금리 혜택!</div>
           </label>
         </div>
       </div>
