@@ -237,16 +237,16 @@ function renderStory() {
   const current = storyData[state.storyIndex];
 
   return `
-    <div id="story-container" style="padding: 30px; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; background: linear-gradient(180deg, #1a2a6c, #11998e); color:white; cursor:pointer; text-align:center;">
-      <div style="flex:1; display:flex; justify-content:center; align-items:center; width:100%;">
+    <div id="story-container" style="padding: 24px; display:flex; flex-direction:column; justify-content:center; align-items:center; height:100%; background: linear-gradient(180deg, #1a2a6c, #11998e); color:white; cursor:pointer; text-align:center;">
+      <div style="flex:1; display:flex; justify-content:center; align-items:center; width:100%; padding-bottom: 20px;">
         <!-- 스토리 일러스트 이미지 -->
         <div style="width:100%; max-width:340px; display:flex; justify-content:center; align-items:center; animation: fadeIn 1.2s ease-out forwards;">
-          <img src="${current.imgSrc}?v=1" alt="스토리 씬" style="width:100%; max-height:50vh; object-fit:contain; border-radius:20px; filter:drop-shadow(0 15px 30px rgba(0,0,0,0.4));">
+          <img src="${current.imgSrc}?v=1" alt="스토리 씬" style="width:100%; max-height:42vh; object-fit:contain; border-radius:16px; filter:drop-shadow(0 15px 30px rgba(0,0,0,0.4));">
         </div>
       </div>
       
-      <div style="height:150px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <p style="font-size:18px; line-height:1.6; font-weight:300; letter-spacing:0.5px; margin-bottom: 20px;">
+      <div style="height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:10;">
+        <p style="font-size:17px; line-height:1.6; font-weight:300; letter-spacing:0.5px; margin-bottom: 10px; word-break:keep-all;">
           ${current.text}
         </p>
       </div>
