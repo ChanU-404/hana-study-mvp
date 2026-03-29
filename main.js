@@ -535,8 +535,8 @@ function renderCommunity() {
         ${state.communityPosts.map(post => `
           <div class="card" style="padding: 24px; margin-bottom: 0; box-shadow: var(--shadow-sm); border-radius: 20px;">
             <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
-              <div style="width:36px; height:36px; background:#EBF3F3; border-radius:50%; display:flex; justify-content:center; align-items:center; color:var(--hana-green); font-size:14px; font-weight:800;">합</div>
-              <span style="font-weight:700; font-size:15px; color:#111;">합격기원</span>
+              <div style="width:36px; height:36px; background:#EBF3F3; border-radius:50%; display:flex; justify-content:center; align-items:center; color:var(--hana-green); font-size:14px; font-weight:800;">${post.author[0]}</div>
+              <span style="font-weight:700; font-size:15px; color:#111;">${post.author}</span>
             </div>
             <p style="font-size:15px; color:#333; line-height:1.6; font-weight:400; margin-bottom: 16px;">${post.content}</p>
             <div style="display:flex; gap:15px; font-size:13px; color:#888;">
