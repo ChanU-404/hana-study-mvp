@@ -630,6 +630,7 @@ function renderChatbotWidget() {
     padding-right: 5px;
     border: 2px solid #DDF0F0;
     border-left: none;
+    animation: float 3s ease-in-out infinite;
   `;
   widget.onclick = () => alert('하나는 챗봇 기능 준비중입니다! 무엇을 도와드릴까요?');
 
@@ -646,6 +647,10 @@ function renderChatbotWidget() {
       @keyframes eq {
         0%, 100% { transform: scaleY(0.4); }
         50% { transform: scaleY(1); }
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
       }
     </style>
   `;
@@ -676,13 +681,13 @@ function renderInterestDetail() {
         <div style="font-size:50px;">🌟</div>
         <div style="text-align:left;">
           <div style="font-size: 22px; font-weight: 800; color: #005a5a; line-height:1.2;">✨ 총 누적 과정금리</div>
-          <div style="font-size: 20px; font-weight: 800; color: #008485;">(최대 4.75%)</div>
+          <div style="font-size: 20px; font-weight: 800; color: #008485;">(최대 4.7%)</div>
         </div>
       </div>
       ${createProgressItem('스터디 모임원 수', '최대 1%', '(인당 0.1%, 최대 1%)', 100, '👨‍👩‍👧‍👦')}
       ${createProgressItem('스터디 이체 금액', '최대 1.5%', '(10만원당 0.1%, 최대 1.5%)', 80, '💵')}
       ${createProgressItem('교육 프로그램 이수', '최대 0.5%', '(건당 0.1%, 최대 0.5%)', 20, '📝')}
-      ${createProgressItem('공부 인증 달성률', '최대 1.75%', '(최대 1.75%)', 60, '📅')}
+      ${createProgressItem('공부 인증 달성률', '최대 1.7%', '(최대 1.7%)', 60, '📅')}
     </div>
   `;
 }
