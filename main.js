@@ -84,16 +84,16 @@ function renderBottomNav() {
   nav.className = 'bottom-nav';
   nav.innerHTML = `
     <div class="nav-item ${['home', 'marketplace'].includes(state.currentView) ? 'active' : ''}" data-view="home">
-      <div class="nav-icon">🏠</div>
-      <span>홈</span>
+      <div class="nav-icon" style="font-size: 24px;">🏠</div>
+      <span style="font-size: 11px; margin-top: 2px;">홈</span>
     </div>
     <div class="nav-item ${state.currentView === 'study' ? 'active' : ''}" data-view="study">
-      <div class="nav-icon">⏱️</div>
-      <span>스터디</span>
+      <div class="nav-icon" style="font-size: 24px;">⏱️</div>
+      <span style="font-size: 11px; margin-top: 2px;">스터디</span>
     </div>
     <div class="nav-item ${state.currentView === 'community' ? 'active' : ''}" data-view="community">
-      <div class="nav-icon">💬</div>
-      <span>커뮤니티</span>
+      <div class="nav-icon" style="font-size: 24px;">💬</div>
+      <span style="font-size: 11px; margin-top: 2px;">커뮤니티</span>
     </div>
   `;
   return nav;
@@ -429,41 +429,49 @@ function renderMarketplace() {
 
 function renderStudy() {
   return `
-    <div style="padding: 24px; height: 100%; display:flex; flex-direction:column; align-items:center;">
-      <h2 style="font-size:20px; font-weight:bold; margin-bottom:40px; text-align:left; width:100%;">스터디 타이머</h2>
-      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; width:100%;">
-        <div class="timer-circle" style="width:260px; height:260px; border-radius:50%; border: 10px solid var(--hana-light-green); display:flex; flex-direction:column; justify-content:center; align-items:center; margin-bottom:40px; box-shadow: inset 0 0 20px rgba(0,0,0,0.03);">
-          <div style="font-size:54px; font-family:monospace; font-weight:bold; color:var(--text-primary); margin-bottom:10px; letter-spacing:-2px;">00:00:00</div>
-          <p style="color:var(--text-secondary); font-size:15px;">오늘의 총 집중 시간</p>
-        </div>
-        <button id="btn-timer" style="background:var(--hana-green); color:#fff; padding:18px 50px; border-radius:40px; font-size:18px; font-weight:bold; border:none; cursor:pointer; box-shadow: 0 6px 15px rgba(0,132,133,0.3); transition: transform 0.1s;">START (화면 잠금)</button>
-      </div>
-      <div style="margin-top:auto; width:100%; background:var(--card-bg); padding:20px; border-radius:var(--border-radius-md); box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-          <p style="font-weight:bold; font-size:14px;">📅 이번 주 인증 사진 (출석 현황)</p>
-          <div style="display:flex; gap:8px;">
-            <label style="font-size:12px; background:#fff3e0; color:#e65100; padding:5px 10px; border-radius:12px; cursor:pointer; font-weight:bold; box-shadow: 0 2px 5px rgba(230,81,0,0.1);">
-              🧾 교육비 인증
-              <input type="file" id="receipt-upload" accept="image/*" style="display:none;">
-            </label>
-            <label style="font-size:12px; background:var(--hana-light-green); color:var(--hana-green); padding:5px 10px; border-radius:12px; cursor:pointer; font-weight:bold;">
-              + 일반 인증
-              <input type="file" id="study-photo-upload" accept="image/*" style="display:none;">
-            </label>
+    <div style="padding: 24px 20px; height: 100%; display:flex; flex-direction:column; align-items:center;">
+      <h2 style="font-size:22px; font-weight:bold; margin-bottom:30px; text-align:left; width:100%; color:#111;">스터디 타이머</h2>
+      
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; width:100%; justify-content: flex-start; padding-top: 20px;">
+        <!-- Timer Circle -->
+        <div style="position: relative; width: 260px; height: 260px; margin-bottom: 40px;">
+          <svg style="transform: rotate(-90deg); width: 100%; height: 100%;">
+            <circle cx="130" cy="130" r="120" stroke="#EBF3F3" stroke-width="20" fill="transparent" />
+            <circle cx="130" cy="130" r="120" stroke="#DDEFEF" stroke-width="20" fill="transparent" stroke-dasharray="753" stroke-dashoffset="200" style="transition: stroke-dashoffset 1s ease;" />
+          </svg>
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+            <div style="font-size: 52px; font-weight: 800; color: #111; letter-spacing: -1px;">00:00:00</div>
+            <p style="color: #888; font-size: 14px; margin-top: 4px;">오늘의 총 집중 시간</p>
           </div>
         </div>
-        <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:5px;">
-          ${state.studyPhotos.length > 0 ? 
-            state.studyPhotos.map(photo => `
-              <div style="min-width:65px; height:65px; border-radius:12px; overflow:hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-                <img src="${photo}" style="width:100%; height:100%; object-fit:cover;">
-              </div>
-            `).join('')
-            :
-            `<div style="min-width:65px; height:65px; border:2px dashed #ccc; border-radius:12px; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#aaa; font-size:12px; background:#fafafa;">
-               <span style="font-size:20px; margin-bottom:2px;">📷</span>오늘 인증
-            </div>`
-          }
+
+        <button id="btn-timer" style="background:var(--hana-dark-green); color:#fff; padding:18px; width:100%; max-width:280px; border-radius:40px; font-size:18px; font-weight:bold; border:none; cursor:pointer; box-shadow: 0 8px 20px rgba(0,90,90,0.2); margin-bottom: 30px;">START (화면 잠금)</button>
+
+        <!-- Certification Sections -->
+        <div style="width:100%; display:flex; flex-direction:column; gap:16px;">
+          <!-- Card 1 -->
+          <div class="card" style="padding: 16px; margin-bottom: 0; box-shadow: var(--shadow-sm); border-radius: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-weight:bold; font-size:15px;">📜 자격증 인증 사진</span>
+              <button style="background:none; border:none; color:var(--hana-green); font-size:12px; font-weight:bold; cursor:pointer;">+ 인증 제출하기</button>
+            </div>
+            <div style="width:70px; height:70px; border: 2px dashed #E0E0E0; border-radius: 12px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#F9FAFB; cursor:pointer;">
+              <span style="font-size:20px;">📷</span>
+              <span style="font-size:10px; color:#999; margin-top:2px;">자격증 인증</span>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="card" style="padding: 16px; margin-bottom: 40px; box-shadow: var(--shadow-sm); border-radius: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-weight:bold; font-size:15px;">👨‍👩‍👧‍👦 내 스터디 그룹</span>
+              <button style="background:none; border:none; color:var(--hana-green); font-size:12px; font-weight:bold; cursor:pointer;">+ 인증 제출하기</button>
+            </div>
+            <div style="width:70px; height:70px; border: 2px dashed #E0E0E0; border-radius: 12px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#F9FAFB; cursor:pointer;">
+              <span style="font-size:20px;">📷</span>
+              <span style="font-size:10px; color:#999; margin-top:2px;">스터디 그룹 인증</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -472,50 +480,71 @@ function renderStudy() {
 
 function renderCommunity() {
   return `
-    <div style="padding: 24px; padding-bottom: 80px;">
-      <h2 style="font-size:20px; font-weight:bold; margin-bottom:20px;">하나은행 취준 라운지</h2>
-      <div style="background: linear-gradient(135deg, #008485, #005a5a); color:#fff; padding:22px; border-radius:var(--border-radius-lg); margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; box-shadow: 0 6px 20px rgba(0,132,133,0.4); position:relative; overflow:hidden;">
-        <div style="position:absolute; right:-20px; top:-20px; width:100px; height:100px; background:rgba(255,255,255,0.1); border-radius:50%;"></div>
-        <div style="z-index:1;">
-          <h3 style="font-size:17px; margin-bottom:6px; font-weight:bolder; letter-spacing:-0.5px;">🎓 취업의 마지막 관문</h3>
-          <p style="font-size:13px; opacity:0.9; line-height:1.4;">하나은행 급여통장 인증하고<br>특별한 졸업 뱃지 & 우대금리 정산받기!</p>
+    <div style="padding: 24px 20px; padding-bottom: 100px;">
+      <h2 style="font-size:22px; font-weight:bold; margin-bottom:20px; color:#111;">하나은행 취준 라운지</h2>
+      
+      <!-- Banner -->
+      <div class="banner" style="margin-bottom:24px; padding: 24px 20px;">
+        <div style="z-index:2; position:relative; max-width: 70%;">
+          <h3 style="font-size:18px; margin-bottom:12px; font-weight:800; display:flex; align-items:center; gap:6px;">
+            🎓 취업의 마지막 관문
+          </h3>
+          <p style="font-size:14px; opacity:0.95; line-height:1.5; font-weight:400; word-break:keep-all;">
+            하나은행 급여통장 인증하고<br>특별한 졸업 뱃지 & 우대금리 정산받기!
+          </p>
         </div>
-        <div style="font-size:45px; z-index:1; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">💼</div>
+        <img src="https://img.icons8.com/bubbles/200/briefcase.png" class="banner-icon" alt="Briefcase">
       </div>
       
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:24px;">
-        <div class="board-card" style="background:var(--card-bg); padding:18px 10px; border-radius:var(--border-radius-md); box-shadow: 0 2px 10px rgba(0,0,0,0.03); text-align:center;">
-          <div style="font-size:26px; margin-bottom:8px;">🔥</div>
-          <p style="font-weight:bold; font-size:13px; color:var(--text-primary);">스터디 모집</p>
+      <!-- Top Grid Buttons (3-column) -->
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:16px;">
+        <div class="board-card" style="padding: 24px 10px;">
+          <div style="font-size:28px; margin-bottom:10px;">🔥</div>
+          <p style="font-weight:700; font-size:13px; color:#111;">스터디 모집</p>
         </div>
-        <div class="board-card" style="background:var(--card-bg); padding:18px 10px; border-radius:var(--border-radius-md); box-shadow: 0 2px 10px rgba(0,0,0,0.03); text-align:center;">
-          <div style="font-size:26px; margin-bottom:8px;">📝</div>
-          <p style="font-weight:bold; font-size:13px; color:var(--text-primary);">취준 후기</p>
+        <div class="board-card" style="padding: 24px 10px;">
+          <div style="font-size:28px; margin-bottom:10px;">🏅</div>
+          <p style="font-weight:700; font-size:13px; color:#111;">스터디 인증</p>
+        </div>
+        <div class="board-card" style="padding: 24px 10px;">
+          <div style="font-size:28px; margin-bottom:10px;">📝</div>
+          <p style="font-weight:700; font-size:13px; color:#111;">취준 후기</p>
         </div>
       </div>
 
-      <!-- 커뮤니티 게시글 렌더링 -->
-      <div style="margin-bottom: 20px;">
-        <div style="display:flex; gap:10px; margin-bottom: 15px;">
-          <input type="text" id="post-input" placeholder="새로운 글을 작성해보세요!" style="flex:1; padding: 12px; border: 1px solid #eee; border-radius: var(--border-radius-md); outline:none; font-size:14px;">
-          <button id="post-btn" style="background:var(--hana-green); color:white; border:none; border-radius: var(--border-radius-md); padding: 0 20px; font-weight:bold; cursor:pointer;">등록</button>
+      <!-- Bottom Grid Buttons (2-column) -->
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:24px;">
+        <div class="board-card" style="display:flex; align-items:center; justify-content:center; gap:12px; padding: 16px;">
+          <div style="font-size:24px;">💬</div>
+          <p style="font-weight:700; font-size:14px; color:#111;">Q&A</p>
         </div>
-        
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          ${state.communityPosts.map(post => `
-            <div style="background:var(--card-bg); padding: 18px; border-radius: var(--border-radius-md); box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-              <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-                <div style="width:30px; height:30px; background:var(--hana-light-green); border-radius:50%; display:flex; justify-content:center; align-items:center; color:var(--hana-green); font-size:14px; font-weight:bold;">${post.author[0]}</div>
-                <span style="font-weight:bold; font-size:14px; color:var(--text-primary);">${post.author}</span>
-              </div>
-              <p style="font-size:14px; color:var(--text-primary); line-height:1.5;">${post.content}</p>
-              <div style="display:flex; gap:15px; margin-top:12px; font-size:12px; color:var(--text-secondary);">
-                <span>❤️ ${post.likes}</span>
-                <span>💬 ${post.comments}</span>
-              </div>
+        <div class="board-card" style="display:flex; align-items:center; justify-content:center; gap:12px; padding: 16px;">
+          <div style="font-size:24px;">⭐</div>
+          <p style="font-weight:700; font-size:14px; color:#111;">벌돌이 자랑</p>
+        </div>
+      </div>
+
+      <!-- Post Input -->
+      <div style="display:flex; gap:12px; margin-bottom: 24px; align-items: stretch;">
+        <input type="text" id="post-input" placeholder="새로운 글을 작성해보세요!" style="flex:1; padding: 14px 18px; border: none; border-radius: 16px; background: #fff; box-shadow: var(--shadow-sm); font-size:14px; outline:none;">
+        <button id="post-btn" style="background:var(--hana-dark-green); color:white; border:none; border-radius: 16px; padding: 0 24px; font-weight:bold; cursor:pointer; box-shadow: 0 4px 12px rgba(0,90,90,0.15);">등록</button>
+      </div>
+      
+      <!-- Community Posts -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        ${state.communityPosts.map(post => `
+          <div class="card" style="padding: 24px; margin-bottom: 0; box-shadow: var(--shadow-sm); border-radius: 20px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+              <div style="width:36px; height:36px; background:#EBF3F3; border-radius:50%; display:flex; justify-content:center; align-items:center; color:var(--hana-green); font-size:14px; font-weight:800;">합</div>
+              <span style="font-weight:700; font-size:15px; color:#111;">합격기원</span>
             </div>
-          `).join('')}
-        </div>
+            <p style="font-size:15px; color:#333; line-height:1.6; font-weight:400; margin-bottom: 16px;">${post.content}</p>
+            <div style="display:flex; gap:15px; font-size:13px; color:#888;">
+              <span style="display:flex; align-items:center; gap:4px;">❤️ ${post.likes}</span>
+              <span style="display:flex; align-items:center; gap:4px;">💬 ${post.comments}</span>
+            </div>
+          </div>
+        `).join('')}
       </div>
     </div>
   `;
