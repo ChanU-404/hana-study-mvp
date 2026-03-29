@@ -449,6 +449,27 @@ function renderStudy() {
 
         <!-- Certification Sections -->
         <div style="width:100%; display:flex; flex-direction:column; gap:16px;">
+          <!-- Card 0: Weekly Attendance (Added back) -->
+          <div class="card" style="padding: 16px; margin-bottom: 0; box-shadow: var(--shadow-sm); border-radius: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-weight:bold; font-size:15px;">📅 이번 주 인증 사진 (출석 현황)</span>
+              <button style="background:var(--hana-light-green); border:none; color:var(--hana-green); font-size:12px; font-weight:bold; cursor:pointer; padding: 6px 12px; border-radius: 20px;">+ 인증 제출하기</button>
+            </div>
+            <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:5px;">
+              ${state.studyPhotos.length > 0 ? 
+                state.studyPhotos.map(photo => `
+                  <div style="min-width:70px; height:70px; border-radius:12px; overflow:hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                    <img src="${photo}" style="width:100%; height:100%; object-fit:cover;">
+                  </div>
+                `).join('')
+                :
+                `<div style="min-width:70px; height:70px; border: 2px dashed #E0E0E0; border-radius: 12px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#F9FAFB; color:#aaa; font-size:10px;">
+                   <span style="font-size:20px; margin-bottom:2px;">📷</span>오늘 인증
+                </div>`
+              }
+            </div>
+          </div>
+
           <!-- Card 1 -->
           <div class="card" style="padding: 16px; margin-bottom: 0; box-shadow: var(--shadow-sm); border-radius: 20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
