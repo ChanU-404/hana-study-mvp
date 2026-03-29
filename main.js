@@ -39,7 +39,8 @@ const state = {
   communityPosts: [
     { id: 1, author: '합격기원', content: '하반기 하나은행 자소서 스터디 구합니다! (비대면)', likes: 12, comments: 4 },
     { id: 2, author: '면접왕별돌', content: 'PT 면접 팁 공유합니다. 꼭 읽어보세요.', likes: 45, comments: 12 }
-  ]
+  ],
+  chatbotPos: { x: 0, y: 400 } // Default position in pixels
 };
 
 const views = {
@@ -611,33 +612,32 @@ function renderQuiz() {
 
 function renderChatbotWidget() {
   const widget = document.createElement('div');
+  widget.id = 'chatbot-widget';
   widget.style.cssText = `
     position: absolute;
-    top: 55%;
-    left: 0;
+    top: ${state.chatbotPos.y}px;
+    left: ${state.chatbotPos.x}px;
     width: 65px;
     height: 65px;
-    border-radius: 0 16px 16px 0;
+    border-radius: 16px;
     background: #fff;
     box-shadow: 4px 4px 15px rgba(0,0,0,0.15);
-    cursor: pointer;
+    cursor: grab;
     z-index: 1000;
-    transition: transform 0.2s;
     overflow: hidden;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    padding-right: 5px;
+    justify-content: center;
     border: 2px solid #DDF0F0;
-    border-left: none;
+    touch-action: none;
+    user-select: none;
     animation: float 3s ease-in-out infinite;
   `;
-  widget.onclick = () => alert('하나는 챗봇 기능 준비중입니다! 무엇을 도와드릴까요?');
 
   widget.innerHTML = `
-    <img src="./assets/byeordori.png" style="width: 55px; height: 55px; object-fit: cover; border-radius: 12px; transform: translateX(-5px);" 
+    <img src="./assets/byeordori.png" style="width: 55px; height: 55px; object-fit: cover; border-radius: 12px; pointer-events: none;" 
       onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'%23e0e0e0\\' rx=\\'20\\'/><circle cx=\\'50\\' cy=\\'45\\' r=\\'20\\' fill=\\'white\\'/></svg>'">
-    <div style="position: absolute; bottom: 8px; left: 15px; display: flex; gap: 3px; align-items: flex-end; height: 16px; z-index: 2;">
+    <div style="position: absolute; bottom: 8px; left: 15px; display: flex; gap: 3px; align-items: flex-end; height: 16px; z-index: 2; pointer-events: none;">
       <div style="width: 4px; height: 40%; background: #00ff00; border-radius: 2px; animation: eq 1s infinite ease-in-out;"></div>
       <div style="width: 4px; height: 100%; background: #00ff00; border-radius: 2px; animation: eq 1s infinite ease-in-out 0.2s;"></div>
       <div style="width: 4px; height: 30%; background: #00ff00; border-radius: 2px; animation: eq 1s infinite ease-in-out 0.4s;"></div>
@@ -654,6 +654,68 @@ function renderChatbotWidget() {
       }
     </style>
   `;
+
+  let isDragging = false;
+  let startX, startY;
+  let initialX, initialY;
+
+  const onStart = (e) => {
+    isDragging = true;
+    widget.style.cursor = 'grabbing';
+    widget.style.animation = 'none'; // dragging 중에는 floating 중지
+    const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+    
+    startX = clientX;
+    startY = clientY;
+    initialX = state.chatbotPos.x;
+    initialY = state.chatbotPos.y;
+    
+    e.preventDefault();
+  };
+
+  const onMove = (e) => {
+    if (!isDragging) return;
+    const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+    
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+    
+    state.chatbotPos.x = initialX + dx;
+    state.chatbotPos.y = initialY + dy;
+    
+    // 경계값 처리 (appContainer 안에서만 움직이게)
+    const rect = appContainer.getBoundingClientRect();
+    state.chatbotPos.x = Math.max(0, Math.min(state.chatbotPos.x, rect.width - 65));
+    state.chatbotPos.y = Math.max(0, Math.min(state.chatbotPos.y, rect.height - 65));
+
+    widget.style.left = `${state.chatbotPos.x}px`;
+    widget.style.top = `${state.chatbotPos.y}px`;
+  };
+
+  const onEnd = () => {
+    if (!isDragging) return;
+    isDragging = false;
+    widget.style.cursor = 'grab';
+    widget.style.animation = 'float 3s ease-in-out infinite';
+  };
+
+  widget.addEventListener('mousedown', onStart);
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onEnd);
+
+  widget.addEventListener('touchstart', onStart);
+  window.addEventListener('touchmove', onMove);
+  window.addEventListener('touchend', onEnd);
+  
+  // 클릭(탭) 시 알림 처리는 드래그가 아닐 때만 하도록 수정 가능하나 일단 유지
+  widget.addEventListener('click', (e) => {
+    if (Math.abs(startX - (e.clientX || (e.touches && e.touches[0].clientX))) < 5) {
+       // alert('하나는 챗봇 기능 준비중입니다!');
+    }
+  });
+
   return widget;
 }
 
