@@ -51,7 +51,8 @@ const views = {
   'study': renderStudy,
   'community': renderCommunity,
   'marketplace': renderMarketplace,
-  'quiz': renderQuiz
+  'quiz': renderQuiz,
+  'interest_detail': renderInterestDetail
 }
 
 const appContainer = document.querySelector('#app')
@@ -67,6 +68,7 @@ function renderApp() {
   const noNavViews = ['login', 'story', 'character_select', 'onboarding'];
   if(!noNavViews.includes(state.currentView)) {
     appContainer.appendChild(renderBottomNav());
+    appContainer.appendChild(renderChatbotWidget());
     attachNavListeners();
   }
   attachViewListeners();
@@ -329,7 +331,10 @@ function renderHome() {
       
       <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px;">
         <h3 style="font-size:15px; font-weight:bold;">📈 금주 우대금리 달성도 (3/5일)</h3>
-        <span style="font-size:12px; color:var(--hana-green); font-weight:bold;">현재 +1.5%</span>
+        <div id="btn-interest-rate" style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:12px; color:var(--text-secondary); font-weight:500;">누적 이자금액 : <span style="font-weight:bold; color:var(--text-primary);">23,467원</span></span>
+          <span style="font-size:12px; color:var(--hana-green); font-weight:bold; padding:4px 8px; border:1px solid var(--hana-green); border-radius:12px; background:var(--hana-light-green);">현재 +1.5%</span>
+        </div>
       </div>
       <div style="height:12px; background:#e0e0e0; border-radius:10px; overflow:hidden; margin-bottom: 24px;">
         <div style="height:100%; width:60%; background:var(--hana-green); border-radius:10px; transition: width 0.5s;"></div>
@@ -604,6 +609,84 @@ function renderQuiz() {
   `;
 }
 
+function renderChatbotWidget() {
+  const widget = document.createElement('div');
+  widget.style.cssText = `
+    position: absolute;
+    top: 55%;
+    left: 0;
+    width: 65px;
+    height: 65px;
+    border-radius: 0 16px 16px 0;
+    background: #fff;
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.15);
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.2s;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 5px;
+    border: 2px solid #DDF0F0;
+    border-left: none;
+  `;
+  widget.onclick = () => alert('하나는 챗봇 기능 준비중입니다! 무엇을 도와드릴까요?');
+
+  widget.innerHTML = `
+    <img src="./assets/byeordori.png" style="width: 55px; height: 55px; object-fit: cover; border-radius: 12px; transform: translateX(-5px);" 
+      onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'%23e0e0e0\\' rx=\\'20\\'/><circle cx=\\'50\\' cy=\\'45\\' r=\\'20\\' fill=\\'white\\'/></svg>'">
+    <div style="position: absolute; bottom: 8px; left: 15px; display: flex; gap: 3px; align-items: flex-end; height: 16px; z-index: 2;">
+      <div style="width: 4px; height: 40%; background: #00ff00; border-radius: 2px; animation: eq 1s infinite ease-in-out;"></div>
+      <div style="width: 4px; height: 100%; background: #00ff00; border-radius: 2px; animation: eq 1s infinite ease-in-out 0.2s;"></div>
+      <div style="width: 4px; height: 30%; background: #00ff00; border-radius: 2px; animation: eq 1s infinite ease-in-out 0.4s;"></div>
+      <div style="width: 4px; height: 70%; background: #00ff00; border-radius: 2px; animation: eq 1s infinite ease-in-out 0.6s;"></div>
+    </div>
+    <style>
+      @keyframes eq {
+        0%, 100% { transform: scaleY(0.4); }
+        50% { transform: scaleY(1); }
+      }
+    </style>
+  `;
+  return widget;
+}
+
+function renderInterestDetail() {
+  const createProgressItem = (title, maxRate, desc, percent, iconText) => `
+    <div style="margin-bottom: 24px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="font-size:32px;">${iconText}</div>
+          <span style="font-size:16px; font-weight:bold; color:#333;">${title}</span>
+        </div>
+        <span style="font-size:16px; font-weight:900; color:#111;">${maxRate}</span>
+      </div>
+      <div style="height:16px; background:#e0e0e0; border-radius:10px; position:relative; margin-bottom:6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+        <div style="height:100%; width:${percent}%; background: linear-gradient(90deg, #00b09b, #96c93d); border-radius:10px;"></div>
+        <div style="position:absolute; left:calc(${percent}% - 14px); top:-6px; background:#fff; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,0.2); width:28px; height:28px; display:flex; justify-content:center; align-items:center; font-size:14px;">🚀</div>
+      </div>
+      <div style="font-size:12px; color:#666;">${desc}</div>
+    </div>
+  `;
+  return `
+    <div style="padding: 24px; position:relative; min-height:100%; background:#fff;">
+      <div id="btn-back-interest" style="font-size:24px; cursor:pointer; font-weight:bold; margin-bottom:20px; color:var(--text-primary);">←</div>
+      <div style="text-align:center; margin-bottom: 40px; display:flex; justify-content:center; align-items:center; gap: 15px;">
+        <div style="font-size:50px;">🌟</div>
+        <div style="text-align:left;">
+          <div style="font-size: 22px; font-weight: 800; color: #005a5a; line-height:1.2;">✨ 총 누적 과정금리</div>
+          <div style="font-size: 20px; font-weight: 800; color: #008485;">(최대 4.75%)</div>
+        </div>
+      </div>
+      ${createProgressItem('스터디 모임원 수', '최대 1%', '(인당 0.1%, 최대 1%)', 100, '👨‍👩‍👧‍👦')}
+      ${createProgressItem('스터디 이체 금액', '최대 1.5%', '(10만원당 0.1%, 최대 1.5%)', 80, '💵')}
+      ${createProgressItem('교육 프로그램 이수', '최대 0.5%', '(건당 0.1%, 최대 0.5%)', 20, '📝')}
+      ${createProgressItem('공부 인증 달성률', '최대 1.75%', '(최대 1.75%)', 60, '📅')}
+    </div>
+  `;
+}
+
 function attachViewListeners() {
   if(state.currentView === 'login') {
     const loginBtns = document.querySelectorAll('.login-btn');
@@ -666,6 +749,14 @@ function attachViewListeners() {
     if(charArea) {
       charArea.addEventListener('click', () => {
         state.currentView = 'marketplace';
+        renderApp();
+      });
+    }
+
+    const interestRateBtn = document.getElementById('btn-interest-rate');
+    if (interestRateBtn) {
+      interestRateBtn.addEventListener('click', () => {
+        state.currentView = 'interest_detail';
         renderApp();
       });
     }
@@ -853,6 +944,11 @@ function attachViewListeners() {
         renderApp();
       });
     });
+  }
+
+  if(state.currentView === 'interest_detail') {
+    const btnBack = document.getElementById('btn-back-interest');
+    if(btnBack) btnBack.addEventListener('click', () => { state.currentView = 'home'; renderApp(); });
   }
 }
 
