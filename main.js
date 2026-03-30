@@ -40,7 +40,11 @@ const state = {
     { id: 1, author: '합격기원', content: '하반기 하나은행 자소서 스터디 구합니다! (비대면)', likes: 12, comments: 4 },
     { id: 2, author: '면접왕별돌', content: 'PT 면접 팁 공유합니다. 꼭 읽어보세요.', likes: 45, comments: 12 }
   ],
-  chatbotPos: { x: 0, y: 400 } // Default position in pixels
+  chatbotPos: { x: 0, y: 400 }, // Default position in pixels
+  timerSeconds: 0,
+  isTimerRunning: false,
+  isTimerLocked: false,
+  certificationPhotos: [] 
 };
 
 const views = {
@@ -434,8 +438,17 @@ function renderMarketplace() {
 }
 
 function renderStudy() {
+  const formatTime = (totalSeconds) => {
+    const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  const timerColor = state.isTimerRunning ? '#FF5E5E' : '#111';
+
   return `
-    <div style="padding: 24px 20px; height: 100%; display:flex; flex-direction:column; align-items:center;">
+    <div style="padding: 24px 20px; height: 100%; display:flex; flex-direction:column; align-items:center; position:relative; overflow:hidden;">
       <h2 style="font-size:22px; font-weight:bold; margin-bottom:30px; text-align:left; width:100%; color:#111;">스터디 타이머</h2>
       
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; width:100%; justify-content: flex-start; padding-top: 20px;">
@@ -443,23 +456,26 @@ function renderStudy() {
         <div style="position: relative; width: 260px; height: 260px; margin-bottom: 40px;">
           <svg style="transform: rotate(-90deg); width: 100%; height: 100%;">
             <circle cx="130" cy="130" r="120" stroke="#EBF3F3" stroke-width="20" fill="transparent" />
-            <circle cx="130" cy="130" r="120" stroke="#DDEFEF" stroke-width="20" fill="transparent" stroke-dasharray="753" stroke-dashoffset="200" style="transition: stroke-dashoffset 1s ease;" />
+            <circle cx="130" cy="130" r="120" stroke="${state.isTimerRunning ? '#FF5E5E' : '#DDEFEF'}" stroke-width="20" fill="transparent" stroke-dasharray="753" stroke-dashoffset="${753 - (753 * (state.timerSeconds % 60) / 60)}" style="transition: stroke-dashoffset 1s linear, stroke 0.3s;" />
           </svg>
           <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-            <div style="font-size: 52px; font-weight: 800; color: #111; letter-spacing: -1px;">00:00:00</div>
+            <div id="timer-display" style="font-size: 52px; font-weight: 800; color: ${timerColor}; letter-spacing: -1px; transition: color 0.3s;">${formatTime(state.timerSeconds)}</div>
             <p style="color: #888; font-size: 14px; margin-top: 4px;">오늘의 총 집중 시간</p>
           </div>
         </div>
 
-        <button id="btn-timer" style="background:var(--hana-dark-green); color:#fff; padding:18px; width:100%; max-width:280px; border-radius:40px; font-size:18px; font-weight:bold; border:none; cursor:pointer; box-shadow: 0 8px 20px rgba(0,90,90,0.2); margin-bottom: 30px;">START (화면 잠금)</button>
+        <button id="btn-timer" style="background:${state.isTimerRunning ? '#FF5E5E' : 'var(--hana-dark-green)'}; color:#fff; padding:18px; width:100%; max-width:280px; border-radius:40px; font-size:18px; font-weight:bold; border:none; cursor:pointer; box-shadow: 0 8px 20px rgba(0,90,90,0.2); margin-bottom: 30px; transition: all 0.3s;">
+          ${state.isTimerRunning ? 'LOCK (집중 중)' : 'START (화면 잠금)'}
+        </button>
 
         <!-- Certification Sections -->
-        <div style="width:100%; display:flex; flex-direction:column; gap:16px;">
-          <!-- Card 0: Weekly Attendance (Added back) -->
+        <div style="width:100%; display:flex; flex-direction:column; gap:16px; padding-bottom: 50px;">
+          <!-- Card 0: Weekly Attendance -->
           <div class="card" style="padding: 16px; margin-bottom: 0; box-shadow: var(--shadow-sm); border-radius: 20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <span style="font-weight:bold; font-size:15px;">📅 이번 주 인증 사진 (출석 현황)</span>
-              <button style="background:var(--hana-light-green); border:none; color:var(--hana-green); font-size:12px; font-weight:bold; cursor:pointer; padding: 6px 12px; border-radius: 20px;">+ 인증 제출하기</button>
+              <label for="study-photo-upload" style="background:var(--hana-light-green); border:none; color:var(--hana-green); font-size:12px; font-weight:bold; cursor:pointer; padding: 6px 12px; border-radius: 20px; display:inline-block;">+ 인증 제출하기</label>
+              <input type="file" id="study-photo-upload" style="display:none;" accept="image/*">
             </div>
             <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:5px;">
               ${state.studyPhotos.length > 0 ? 
@@ -476,19 +492,30 @@ function renderStudy() {
             </div>
           </div>
 
-          <!-- Card 1 -->
+          <!-- Card 1: Certification -->
           <div class="card" style="padding: 16px; margin-bottom: 0; box-shadow: var(--shadow-sm); border-radius: 20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <span style="font-weight:bold; font-size:15px;">📜 자격증 인증 사진</span>
-              <button style="background:none; border:none; color:var(--hana-green); font-size:12px; font-weight:bold; cursor:pointer;">+ 인증 제출하기</button>
+              <label for="cert-photo-upload" style="background:none; border:none; color:var(--hana-green); font-size:12px; font-weight:bold; cursor:pointer;">+ 인증 제출하기</label>
+              <input type="file" id="cert-photo-upload" style="display:none;" accept="image/*">
             </div>
-            <div style="width:70px; height:70px; border: 2px dashed #E0E0E0; border-radius: 12px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#F9FAFB; cursor:pointer;">
-              <span style="font-size:20px;">📷</span>
-              <span style="font-size:10px; color:#999; margin-top:2px;">자격증 인증</span>
+            <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:5px;">
+              ${state.certificationPhotos.length > 0 ? 
+                state.certificationPhotos.map(photo => `
+                  <div style="min-width:70px; height:70px; border-radius:12px; overflow:hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                    <img src="${photo}" style="width:100%; height:100%; object-fit:cover;">
+                  </div>
+                `).join('')
+                :
+                `<div style="width:70px; height:70px; border: 2px dashed #E0E0E0; border-radius: 12px; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#F9FAFB; cursor:pointer;">
+                  <span style="font-size:20px;">📷</span>
+                  <span style="font-size:10px; color:#999; margin-top:2px;">자격증 인증</span>
+                </div>`
+              }
             </div>
           </div>
 
-          <!-- Card 2 -->
+          <!-- Card 2: Study Group -->
           <div class="card" style="padding: 16px; margin-bottom: 40px; box-shadow: var(--shadow-sm); border-radius: 20px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <span style="font-weight:bold; font-size:15px;">👨‍👩‍👧‍👦 내 스터디 그룹</span>
@@ -501,6 +528,16 @@ function renderStudy() {
           </div>
         </div>
       </div>
+
+      <!-- Timer Lock Overlay -->
+      ${state.isTimerLocked ? `
+        <div id="lock-screen" style="position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; animation: fadeIn 0.5s;">
+           <div style="font-size:80px; margin-bottom:20px;">🔒</div>
+           <h2 style="font-size:24px; font-weight:bold; margin-bottom:10px;">집중 시간입니다!</h2>
+           <p style="margin-bottom:40px; opacity:0.8;">현재 타이머가 작동 중입니다.</p>
+           <button id="btn-unlock" style="background:#fff; color:#000; padding:16px 40px; border-radius:30px; font-weight:bold; border:none; cursor:pointer; font-size:18px; box-shadow:0 0 20px rgba(255,255,255,0.3);">집중 종료 (잠금 해제)</button>
+        </div>
+      ` : ''}
     </div>
   `;
 }
@@ -894,16 +931,53 @@ function attachViewListeners() {
   }
 
   if(state.currentView === 'study') {
-    const photoUpload = document.getElementById('study-photo-upload');
-    if(photoUpload) {
-      photoUpload.addEventListener('change', (e) => {
+    const timerBtn = document.getElementById('btn-timer');
+    if(timerBtn) {
+      timerBtn.addEventListener('click', () => {
+        if(!state.isTimerRunning) {
+          state.isTimerRunning = true;
+          state.isTimerLocked = true;
+          renderApp();
+        }
+      });
+    }
+
+    const unlockBtn = document.getElementById('btn-unlock');
+    if(unlockBtn) {
+      unlockBtn.addEventListener('click', () => {
+        state.isTimerRunning = false;
+        state.isTimerLocked = false;
+        renderApp();
+      });
+    }
+
+    const studyPhotoUpload = document.getElementById('study-photo-upload');
+    if(studyPhotoUpload) {
+      studyPhotoUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if(file) {
           const reader = new FileReader();
           reader.onload = (event) => {
             state.studyPhotos.unshift(event.target.result);
-            state.points += 50; // 사진 인증 포인트
-            alert('인증 완료! 🪙 50P를 획득했습니다.');
+            state.points += 50; 
+            alert('출석 인증 완료! 🪙 50P를 획득했습니다.');
+            renderApp();
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    const certPhotoUpload = document.getElementById('cert-photo-upload');
+    if(certPhotoUpload) {
+      certPhotoUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if(file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            state.certificationPhotos.unshift(event.target.result);
+            state.points += 100; // 자격증 인증은 더 큰 보상
+            alert('자격증 인증 완료! 🪙 100P를 획득했습니다.');
             renderApp();
           };
           reader.readAsDataURL(file);
@@ -918,7 +992,7 @@ function attachViewListeners() {
         if(file) {
           const reader = new FileReader();
           reader.onload = (event) => {
-            const reward = Math.floor(Math.random() * 41) + 10; // 10 ~ 50 points
+            const reward = Math.floor(Math.random() * 41) + 10; 
             state.points += reward;
             state.receiptAuthCount++;
             
@@ -1020,4 +1094,17 @@ function attachViewListeners() {
 }
 
 // Init
+setInterval(() => {
+  if (state.isTimerRunning) {
+    state.timerSeconds++;
+    const timerDisplay = document.getElementById('timer-display');
+    if (timerDisplay) {
+      const hours = Math.floor(state.timerSeconds / 3600).toString().padStart(2, '0');
+      const minutes = Math.floor((state.timerSeconds % 3600) / 60).toString().padStart(2, '0');
+      const seconds = (state.timerSeconds % 60).toString().padStart(2, '0');
+      timerDisplay.innerText = `${hours}:${minutes}:${seconds}`;
+    }
+  }
+}, 1000);
+
 renderApp();
