@@ -44,7 +44,8 @@ const state = {
   timerSeconds: 0,
   isTimerRunning: false,
   isTimerLocked: false,
-  certificationPhotos: [] 
+  certificationPhotos: [],
+  isChatOpen: false
 };
 
 const views = {
@@ -74,6 +75,9 @@ function renderApp() {
   if(!noNavViews.includes(state.currentView)) {
     appContainer.appendChild(renderBottomNav());
     appContainer.appendChild(renderChatbotWidget());
+    if(state.isChatOpen) {
+      appContainer.appendChild(renderChatWindow());
+    }
     attachNavListeners();
   }
   attachViewListeners();
@@ -746,14 +750,78 @@ function renderChatbotWidget() {
   window.addEventListener('touchmove', onMove);
   window.addEventListener('touchend', onEnd);
   
-  // 클릭(탭) 시 알림 처리는 드래그가 아닐 때만 하도록 수정 가능하나 일단 유지
+  // 클릭(탭) 시 채팅창 열기
   widget.addEventListener('click', (e) => {
-    if (Math.abs(startX - (e.clientX || (e.touches && e.touches[0].clientX))) < 5) {
-       // alert('하나는 챗봇 기능 준비중입니다!');
+    // 드래그가 아닐 때만 작동
+    if (Math.abs(startX - (e.clientX || (e.touches && e.touches[0].clientX))) < 10) {
+       state.isChatOpen = !state.isChatOpen;
+       renderApp();
     }
   });
 
   return widget;
+}
+
+function renderChatWindow() {
+  const chat = document.createElement('div');
+  chat.style.cssText = `
+    position: absolute;
+    bottom: 90px;
+    right: 20px;
+    width: 280px;
+    height: 380px;
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    z-index: 2005;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  `;
+
+  chat.innerHTML = `
+    <div style="background: var(--hana-green); padding: 15px; color: white; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px;">🌟</div>
+        <span style="font-weight: bold;">별돌이 소통 창구</span>
+      </div>
+      <div id="btn-close-chat" style="cursor: pointer; font-size: 20px;">✕</div>
+    </div>
+    
+    <div style="flex: 1; padding: 15px; background: #F8F9FA; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;">
+      <div style="align-self: flex-start; background: white; padding: 10px 14px; border-radius: 16px 16px 16px 0; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-width: 85%;">
+        반가워요! 저는 당신의 별돌이에요. 무엇을 도와드릴까요? ✨
+      </div>
+      <div style="align-self: flex-start; background: white; padding: 10px 14px; border-radius: 16px 16px 16px 0; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); max-width: 85%;">
+        현재 하나드롭 우대금리 혜택이 적용 중입니다. 확인해 보시겠어요?
+      </div>
+    </div>
+    
+    <div style="padding: 15px; background: white; border-top: 1px solid #eee; display: flex; gap: 8px;">
+      <input type="text" placeholder="메시지를 입력하세요..." style="flex: 1; border: none; background: #f0f2f5; padding: 10px 15px; border-radius: 20px; font-size: 14px; outline: none;">
+      <div style="width: 36px; height: 36px; background: var(--hana-green); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; cursor: pointer;">✈️</div>
+    </div>
+    
+    <style>
+      @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+    </style>
+  `;
+
+  setTimeout(() => {
+    const closeBtn = chat.querySelector('#btn-close-chat');
+    if(closeBtn) {
+      closeBtn.onclick = () => {
+        state.isChatOpen = false;
+        renderApp();
+      };
+    }
+  }, 0);
+
+  return chat;
 }
 
 function renderInterestDetail() {
