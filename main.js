@@ -45,7 +45,9 @@ const state = {
   isTimerRunning: false,
   isTimerLocked: false,
   certificationPhotos: [],
-  isChatOpen: false
+  isChatOpen: false,
+  isAiAnalyzing: false,
+  aiModalState: null
 };
 
 const views = {
@@ -81,6 +83,17 @@ function renderApp() {
     attachNavListeners();
   }
   attachViewListeners();
+
+  if (state.isAiAnalyzing || state.aiModalState) {
+    appContainer.appendChild(renderAiModal());
+    const closeBtn = document.getElementById('ai-modal-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        state.aiModalState = null;
+        renderApp();
+      });
+    }
+  }
 
   // [Canvas 렌더링 호출]: 뷰가 DOM에 붙은 직후 Canvas에 이미지를 그림
   if (state.currentView === 'home') {
@@ -1024,15 +1037,27 @@ function attachViewListeners() {
       studyPhotoUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if(file) {
+          state.isAiAnalyzing = true;
+          renderApp();
+          
           const reader = new FileReader();
           reader.onload = (event) => {
-            state.studyPhotos.unshift(event.target.result);
-            state.points += 50; 
-            alert('출석 인증 완료! 🪙 50P를 획득했습니다.');
-            renderApp();
+            const base64Data = event.target.result;
+            setTimeout(() => {
+              state.isAiAnalyzing = false;
+              if (state.studyPhotos.includes(base64Data)) {
+                state.aiModalState = { type: 'error', message: '이전에 업로드된 사진과 동일한 이미지(도용)가 AI 시스템에 감지되었습니다! 인증이 취소됩니다.' };
+              } else {
+                state.studyPhotos.unshift(base64Data);
+                state.points += 50; 
+                state.aiModalState = { type: 'success', message: '출석 인증 완료! 🪙 50P를 획득했습니다.' };
+              }
+              renderApp();
+            }, 1800);
           };
           reader.readAsDataURL(file);
         }
+        e.target.value = '';
       });
     }
 
@@ -1041,15 +1066,27 @@ function attachViewListeners() {
       certPhotoUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if(file) {
+          state.isAiAnalyzing = true;
+          renderApp();
+          
           const reader = new FileReader();
           reader.onload = (event) => {
-            state.certificationPhotos.unshift(event.target.result);
-            state.points += 100; // 자격증 인증은 더 큰 보상
-            alert('자격증 인증 완료! 🪙 100P를 획득했습니다.');
-            renderApp();
+            const base64Data = event.target.result;
+            setTimeout(() => {
+              state.isAiAnalyzing = false;
+              if (state.certificationPhotos.includes(base64Data)) {
+                state.aiModalState = { type: 'error', message: '이전에 업로드된 자격증 사진과 동일한 이미지(도용)가 감지되었습니다! 인증을 거부합니다.' };
+              } else {
+                state.certificationPhotos.unshift(base64Data);
+                state.points += 100;
+                state.aiModalState = { type: 'success', message: '자격증 인증 완료! 🪙 100P를 획득했습니다.' };
+              }
+              renderApp();
+            }, 1800);
           };
           reader.readAsDataURL(file);
         }
+        e.target.value = '';
       });
     }
 
@@ -1159,6 +1196,45 @@ function attachViewListeners() {
     const btnBack = document.getElementById('btn-back-interest');
     if(btnBack) btnBack.addEventListener('click', () => { state.currentView = 'home'; renderApp(); });
   }
+}
+
+function renderAiModal() {
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); z-index: 3000;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    backdrop-filter: blur(4px); animation: fadeIn 0.3s;
+  `;
+
+  if (state.isAiAnalyzing) {
+    modal.innerHTML = `
+      <div style="background:#fff; border-radius:20px; padding:30px 20px; width:80%; max-width:320px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <div style="font-size:50px; margin-bottom:15px; animation: float 1.5s infinite ease-in-out;">🤖</div>
+        <h3 style="font-size:18px; font-weight:bold; color:var(--hana-green); margin-bottom:10px;">AI 비전 분석 중...</h3>
+        <p style="font-size:14px; color:#555; line-height:1.5;">이미지의 진위 여부 및 중복 도용을<br>AI가 실시간으로 판독하고 있습니다.</p>
+        <div style="margin-top:20px; height:6px; background:#eee; border-radius:3px; overflow:hidden;">
+           <div style="height:100%; width:100%; background:var(--hana-green); animation: loadingBar 1.5s infinite linear;"></div>
+        </div>
+      </div>
+      <style>
+        @keyframes loadingBar { 0% { transform:translateX(-100%); } 100% { transform:translateX(100%); } }
+      </style>
+    `;
+  } else if (state.aiModalState) {
+    const isError = state.aiModalState.type === 'error';
+    const color = isError ? '#FF5E5E' : '#008485';
+    const icon = isError ? '🚨' : '✅';
+    modal.innerHTML = `
+      <div style="background:#fff; border-radius:20px; padding:30px 20px; width:80%; max-width:320px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+        <div style="font-size:50px; margin-bottom:15px;">${icon}</div>
+        <h3 style="font-size:18px; font-weight:bold; color:${color}; margin-bottom:15px;">${isError ? 'AI 도용 적발' : '검증 완료'}</h3>
+        <p style="font-size:14px; color:#333; line-height:1.5; margin-bottom:24px; word-break:keep-all;">${state.aiModalState.message}</p>
+        <button id="ai-modal-close" style="width:100%; background:${color}; color:#fff; border:none; padding:14px; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer;">확인</button>
+      </div>
+    `;
+  }
+  return modal;
 }
 
 // Init

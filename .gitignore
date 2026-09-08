@@ -2,3 +2,25 @@ node_modules
 .DS_Store
 dist
 .env
+.vercel
+.env*.local
+
+# Local files excluded from GitHub backup
+.DS_Store
+.Rhistory
+.RData*
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+.vercel/
+*.db
+*.db-*
+*.sqlite*
+*.log
+*.pem
+*.key
+*recovery*codes*
+
+screenshot/
